@@ -83,17 +83,22 @@ export type TimeRange = "1m" | "3m" | "5m" | "10m";
 export interface ChartDataPoint {
   timestamp: number;
   count: number;
-  agentId?: string;
+  eventTypes?: Record<string, number>;
+  toolEvents?: Record<string, number>;
+  sessions?: Record<string, number>;
 }
 
 export interface ChartConfig {
-  backgroundColor: string;
-  gridColor: string;
-  textColor: string;
-  lineColor: string;
-  agentColors: string[];
-  width: number;
-  height: number;
+  maxDataPoints: number;
+  animationDuration: number;
+  barWidth: number;
+  barGap: number;
+  colors: {
+    primary: string;
+    glow: string;
+    axis: string;
+    text: string;
+  };
 }
 
 export interface ChartDimensions {

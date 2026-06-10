@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ObservabilityThemeProvider, useObsTheme } from "@/observability/ObservabilityThemeProvider";
 import { useObservabilityWebSocket } from "@/observability/hooks/useObservabilityWebSocket";
 import { EventTimeline } from "@/observability/components/EventTimeline";
 import { FilterPanel } from "@/observability/components/FilterPanel";
+import { LivePulseChart } from "@/observability/components/LivePulseChart";
 import { StickScrollButton } from "@/observability/components/StickScrollButton";
 import { ToastNotification } from "@/observability/components/ToastNotification";
 import type { ToastItem } from "@/observability/components/ToastNotification";
-import type { ObsFilters } from "@/observability/lib/types";
+import type { ObsFilters, TimeRange } from "@/observability/lib/types";
 import "@/observability/styles/observability-themes.css";
 
 function ObservabilityInner() {
@@ -19,9 +20,14 @@ function ObservabilityInner() {
   const [selectedAgentLanes, setSelectedAgentLanes] = useState<string[]>([]);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [allAppNames, setAllAppNames] = useState<string[]>([]);
+  const [uniqueAppNames, setUniqueAppNames] = useState<string[]>([]);
+  const [currentTimeRange, setCurrentTimeRange] = useState<TimeRange>("1m");
   const seenAgents = useRef(new Set<string>());
   const toastIdRef = useRef(0);
   const prevConnectedRef = useRef<boolean | null>(null);
+
+  void selectedAgentLanes; // reserved for Phase 6 lane filtering
+  void currentTimeRange;
 
   const addToast = useCallback((message: string, type: ToastItem["type"] = "info") => {
     const id = String(++toastIdRef.current);
@@ -57,18 +63,11 @@ function ObservabilityInner() {
     if (hasNew) setAllAppNames(Array.from(seenAgents.current));
   }, [events]);
 
-  const uniqueAppNames = useMemo(
-    () => [...new Set(events.map((e) => e.source_app))],
-    [events]
-  );
-
   const handleSelectAgent = useCallback((agentId: string) => {
     setSelectedAgentLanes((prev) =>
       prev.includes(agentId) ? prev.filter((id) => id !== agentId) : [...prev, agentId]
     );
   }, []);
-
-  void selectedAgentLanes; // reserved for Phase 5 lane filtering
 
   return (
     <div ref={containerRef} className="obs-root flex h-full min-h-0 flex-col relative">
@@ -104,6 +103,14 @@ function ObservabilityInner() {
           </button>
         </div>
       </div>
+
+      <LivePulseChart
+        events={events}
+        filters={filters}
+        onUpdateUniqueApps={setUniqueAppNames}
+        onUpdateAllApps={setAllAppNames}
+        onUpdateTimeRange={setCurrentTimeRange}
+      />
 
       {showFilters && <FilterPanel filters={filters} onFiltersChange={setFilters} />}
 
