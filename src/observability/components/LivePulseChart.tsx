@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useObsTheme } from "@/observability/ObservabilityThemeProvider";
 import { useChartData } from "@/observability/hooks/useChartData";
 import { createChartRenderer } from "@/observability/lib/chartRenderer";
@@ -60,6 +60,9 @@ export function LivePulseChart({ events, filters, onUpdateUniqueApps, onUpdateAl
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const themeObserverRef = useRef<MutationObserver | null>(null);
   const processedIds = useRef(new Set<string>());
+  const renderRef = useRef<() => void>(() => {});
+  const chartDataRef = useRef(chartData);
+  const effectiveHeightRef = useRef(0);
 
   const [chartWidth, setChartWidth] = useState(300);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
@@ -95,22 +98,31 @@ export function LivePulseChart({ events, filters, onUpdateUniqueApps, onUpdateAl
     );
   }, [chartData]);
 
+  // Keep latest-render and latest-data refs current before the next RAF fires (C5/C6 fix)
+  useLayoutEffect(() => {
+    renderRef.current = render;
+    chartDataRef.current = chartData;
+    effectiveHeightRef.current = effectiveHeight;
+  });
+
   const animateNewEvent = useCallback((x: number, y: number) => {
     if (!rendererRef.current || !mountedRef.current) return;
     const startTime = performance.now();
     const duration = 600;
+    let currentId: number;
     const step = (now: number) => {
+      pulseRafsRef.current.delete(currentId);
       const progress = Math.min((now - startTime) / duration, 1);
       const opacity = (1 - progress) * 0.6;
       const radius = 5 + progress * 30;
       rendererRef.current?.drawPulseEffect(x, y, radius, opacity);
       if (progress < 1 && mountedRef.current) {
-        const id = requestAnimationFrame(step);
-        pulseRafsRef.current.add(id);
+        currentId = requestAnimationFrame(step);
+        pulseRafsRef.current.add(currentId);
       }
     };
-    const id = requestAnimationFrame(step);
-    pulseRafsRef.current.add(id);
+    currentId = requestAnimationFrame(step);
+    pulseRafsRef.current.add(currentId);
   }, []);
 
   const processNewEvents = useCallback((incoming: HookEvent[]) => {
@@ -119,7 +131,7 @@ export function LivePulseChart({ events, filters, onUpdateUniqueApps, onUpdateAl
       const key = `${event.id ?? ""}-${event.timestamp}`;
       if (processedIds.current.has(key)) continue;
       processedIds.current.add(key);
-      chartData.addEvent(event);
+      chartDataRef.current.addEvent(event);
       if (canvasRef.current && chartContainerRef.current) {
         const rect = chartContainerRef.current.getBoundingClientRect();
         const x = rect.width * 0.9;
@@ -127,17 +139,17 @@ export function LivePulseChart({ events, filters, onUpdateUniqueApps, onUpdateAl
         animateNewEvent(x, y);
       }
     }
-  }, [chartData, animateNewEvent]);
+  }, [animateNewEvent]);
 
   // Handle events prop changes
   useEffect(() => {
     if (events.length === 0) {
-      chartData.clearData();
+      chartDataRef.current.clearData();
       processedIds.current.clear();
       return;
     }
     processNewEvents(events);
-  // chartData.clearData and processNewEvents are stable references from useCallback/hook
+  // processNewEvents is stable (no chartData dep); chartDataRef always current via useLayoutEffect
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events]);
 
@@ -186,7 +198,7 @@ export function LivePulseChart({ events, filters, onUpdateUniqueApps, onUpdateAl
       if (!entry || !rendererRef.current) return;
       const w = entry.contentRect.width;
       setChartWidth(w);
-      rendererRef.current.resize({ width: w, height: effectiveHeight, padding: { top: 8, right: 8, bottom: 20, left: 8 } });
+      rendererRef.current.resize({ width: w, height: effectiveHeightRef.current, padding: { top: 8, right: 8, bottom: 20, left: 8 } });
     });
     resizeObserverRef.current.observe(container);
 
@@ -196,20 +208,20 @@ export function LivePulseChart({ events, filters, onUpdateUniqueApps, onUpdateAl
       const newCfg = getActiveConfig(containerRef.current);
       rendererRef.current.setConfig(newCfg);
       rendererRef.current.setDark(containerRef.current?.classList.contains("theme-dark") ?? false);
-      render();
+      renderRef.current();
     });
     if (containerRef.current) {
       themeObserverRef.current.observe(containerRef.current, { attributes: true, attributeFilter: ["class", "style"] });
     }
 
-    // 30fps render loop (C5)
+    // 30fps render loop (C5) — uses renderRef.current() to always call the latest render closure
     let lastRenderTime = 0;
     const frameInterval = 1000 / 30;
     const renderLoop = (currentTime: number) => {
       if (!mountedRef.current) return;
       const delta = currentTime - lastRenderTime;
       if (delta >= frameInterval) {
-        render();
+        renderRef.current();
         lastRenderTime = currentTime - (delta % frameInterval);
       }
       renderLoopRef.current = requestAnimationFrame(renderLoop);
