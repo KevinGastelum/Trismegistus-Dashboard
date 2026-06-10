@@ -246,7 +246,8 @@ export function updateTheme(id: string, updates: Partial<Theme>): boolean {
     if (k === "isPublic") return v ? 1 : 0;
     return v;
   });
-  const result = db.prepare(`UPDATE themes SET ${setClause} WHERE id = ?`).run(...values, id);
+  const bindValues = [...values, id].filter((v) => v !== undefined) as import("bun:sqlite").SQLQueryBindings[];
+  const result = db.prepare(`UPDATE themes SET ${setClause} WHERE id = ?`).run(...bindValues);
   return (result.changes as number) > 0;
 }
 
@@ -268,7 +269,7 @@ export function getTheme(id: string): Theme | null {
 
 export function getThemes(query: ThemeSearchQuery = {}): Theme[] {
   let sql = "SELECT * FROM themes WHERE 1=1";
-  const params: unknown[] = [];
+  const params: import("bun:sqlite").SQLQueryBindings[] = [];
   if (query.isPublic !== undefined) { sql += " AND isPublic = ?"; params.push(query.isPublic ? 1 : 0); }
   if (query.authorId) { sql += " AND authorId = ?"; params.push(query.authorId); }
   if (query.query) {
