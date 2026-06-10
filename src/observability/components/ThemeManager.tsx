@@ -20,8 +20,8 @@ export function ThemeManager({ isOpen, onClose }: ThemeManagerProps) {
     return () => document.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
 
-  if (!portalRoot) return null;
   if (!isOpen) return null;
+  if (!portalRoot) return null;
 
   const themes = Object.values(PREDEFINED_THEMES);
   const count = themes.length;

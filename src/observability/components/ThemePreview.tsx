@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useState } from "react";
 import type { PredefinedTheme } from "@/observability/lib/themeData";
 
 interface ThemePreviewProps {
@@ -8,7 +8,7 @@ interface ThemePreviewProps {
 
 export function ThemePreview({ theme, onApply }: ThemePreviewProps) {
   const { colors } = theme;
-  const applyBtnRef = useRef<HTMLButtonElement | null>(null);
+  const [filterHovered, setFilterHovered] = useState(false);
 
   const paletteKeys: (keyof typeof colors)[] = [
     "primary",
@@ -104,17 +104,10 @@ export function ThemePreview({ theme, onApply }: ThemePreviewProps) {
             <option>All Events</option>
           </select>
           <button
-            ref={applyBtnRef}
             className="text-xs px-2 py-0.5 rounded"
-            style={{ backgroundColor: colors.primary || "#3b82f6", color: colors.bgPrimary || "#fff" }}
-            onMouseEnter={() => {
-              if (applyBtnRef.current)
-                applyBtnRef.current.style.backgroundColor = colors.primaryHover || "#2563eb";
-            }}
-            onMouseLeave={() => {
-              if (applyBtnRef.current)
-                applyBtnRef.current.style.backgroundColor = colors.primary || "#3b82f6";
-            }}
+            style={{ backgroundColor: filterHovered ? (colors.primaryHover || colors.primary || "#2563eb") : (colors.primary || "#3b82f6"), color: colors.bgPrimary || "#fff" }}
+            onMouseEnter={() => setFilterHovered(true)}
+            onMouseLeave={() => setFilterHovered(false)}
           >
             Apply Filters
           </button>
