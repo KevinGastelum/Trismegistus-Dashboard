@@ -23,3 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 bash.exe.stackdump
+
+# Observability event server (bun.lock IS committed per C17)
+observability/server/node_modules/
+observability/server/events.db
+observability/server/events.db-shm
+observability/server/events.db-wal
+# Hook runtime data
+.claude/data/
