@@ -104,10 +104,7 @@ export function ChatTranscriptModal({ isOpen, chat, onClose }: ChatTranscriptMod
   const copyAllTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const timer = copyAllTimer.current;
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
+    return () => { if (copyAllTimer.current) clearTimeout(copyAllTimer.current); };
   }, []);
 
   // Reset state when modal closes

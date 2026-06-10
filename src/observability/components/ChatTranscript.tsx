@@ -22,9 +22,7 @@ export function ChatTranscript({ chat }: ChatTranscriptProps) {
 
   useEffect(() => {
     const timers = copyTimers.current;
-    return () => {
-      timers.forEach((t) => clearTimeout(t));
-    };
+    return () => { timers.forEach((t) => clearTimeout(t)); };
   }, []);
 
   function toggleDetails(index: number) {
@@ -52,11 +50,11 @@ export function ChatTranscript({ chat }: ChatTranscriptProps) {
     });
   }
 
-  function renderMessageContent(content: unknown, isUser: boolean) {
+  function renderMessageContent(content: unknown) {
     if (typeof content === "string") {
       const text = content.includes("<command-") ? cleanCommandContent(content) : content;
       return (
-        <p className={`text-sm whitespace-pre-wrap font-medium ${isUser ? "text-gray-800 dark:text-gray-100" : "text-gray-800 dark:text-gray-100"}`}>
+        <p className="text-sm whitespace-pre-wrap font-medium text-gray-800 dark:text-gray-100">
           {text}
         </p>
       );
@@ -142,7 +140,7 @@ export function ChatTranscript({ chat }: ChatTranscriptProps) {
                     User
                   </span>
                   <div className="flex-1 min-w-0">
-                    {renderMessageContent(message.content, true)}
+                    {renderMessageContent(message.content)}
                   </div>
                 </div>
                 {itemControls}
@@ -162,7 +160,7 @@ export function ChatTranscript({ chat }: ChatTranscriptProps) {
                     Assistant
                   </span>
                   <div className="flex-1 min-w-0">
-                    {renderMessageContent(message.content, false)}
+                    {renderMessageContent(message.content)}
                     {usage && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Tokens: {String(usage.input_tokens ?? 0)} in / {String(usage.output_tokens ?? 0)} out
