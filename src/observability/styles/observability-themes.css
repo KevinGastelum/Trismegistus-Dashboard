@@ -419,6 +419,40 @@
   --theme-focus-ring: #0d9488;
 }
 
+/* Greek Pantheon theme */
+.obs-root.theme-pantheon {
+  --theme-primary: #dfb15b;
+  --theme-primary-hover: #f3c87a;
+  --theme-primary-light: #3a3528;
+  --theme-primary-dark: #9e7529;
+
+  --theme-bg-primary: #041c1c;
+  --theme-bg-secondary: #020e0e;
+  --theme-bg-tertiary: #031515;
+  --theme-bg-quaternary: #1c3030;
+
+  --theme-text-primary: #ffe6cb;
+  --theme-text-secondary: rgba(255, 230, 203, 0.8);
+  --theme-text-tertiary: rgba(255, 230, 203, 0.6);
+  --theme-text-quaternary: rgba(255, 230, 203, 0.4);
+
+  --theme-border-primary: rgba(223, 177, 91, 0.3);
+  --theme-border-secondary: rgba(223, 177, 91, 0.5);
+  --theme-border-tertiary: #dfb15b;
+
+  --theme-accent-success: #34d399;
+  --theme-accent-warning: #fbbf24;
+  --theme-accent-error: #ef4444;
+  --theme-accent-info: #dfb15b;
+
+  --theme-shadow: rgba(0, 0, 0, 0.5);
+  --theme-shadow-lg: rgba(0, 0, 0, 0.75);
+
+  --theme-hover-bg: rgba(223, 177, 91, 0.1);
+  --theme-active-bg: rgba(223, 177, 91, 0.2);
+  --theme-focus-ring: #dfb15b;
+}
+
 /* Utility classes */
 .obs-root .theme-bg-primary { background-color: var(--theme-bg-primary); }
 .obs-root .theme-bg-secondary { background-color: var(--theme-bg-secondary); }

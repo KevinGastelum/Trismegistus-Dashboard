@@ -266,3 +266,39 @@ code { font-size: 0.875rem; }
 :root[style*="--theme-asset-bg:"] .theme-default-filler {
   display: none;
 }
+
+/* ------------------------------------------------------------------ */
+/* Greek Pantheon & Renaissance Custom Styles                        */
+/* ------------------------------------------------------------------ */
+
+.border-pantheon {
+  border: 3px double var(--border);
+}
+
+.border-pantheon-single {
+  border: 1px solid var(--border);
+}
+
+.card-engraving {
+  background: color-mix(in srgb, var(--midground-base) 1%, var(--background-base));
+  border: 1px solid var(--border);
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.card-engraving:hover {
+  border-color: var(--midground);
+  box-shadow: 0 0 12px rgba(255, 230, 203, 0.12);
+}
+
+.font-serif-display {
+  font-family: var(--theme-font-display), serif;
+}
+
+/* Custom styling for document browser card images */
+.woodcut-img {
+  image-rendering: pixelated;
+  mix-blend-mode: color-burn;
+  opacity: 0.85;
+}
+

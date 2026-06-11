@@ -1,6 +1,7 @@
 export type ThemeName =
   | "light"
   | "dark"
+  | "pantheon"
   | "modern"
   | "earth"
   | "glass"
@@ -11,6 +12,7 @@ export type ThemeName =
   | "midnight-purple"
   | "sunset-orange"
   | "mint-fresh";
+
 
 export interface ThemeColors {
   primary: string;
@@ -123,6 +125,7 @@ export const THEME_COLOR_KEYS: ThemeColorKey[] = [
 export const PREDEFINED_THEME_NAMES: ThemeName[] = [
   "light",
   "dark",
+  "pantheon",
   "modern",
   "earth",
   "glass",
@@ -134,6 +137,7 @@ export const PREDEFINED_THEME_NAMES: ThemeName[] = [
   "sunset-orange",
   "mint-fresh",
 ];
+
 
 export const COLOR_REGEX = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 export const RGBA_REGEX =
@@ -536,4 +540,38 @@ export const PREDEFINED_THEMES: Record<ThemeName, PredefinedTheme> = {
       focusRing: "#0d9488",
     },
   },
+  pantheon: {
+    name: "pantheon",
+    displayName: "Greek Pantheon",
+    description: "Greek Pantheon Renaissance theme with teal and gold accents",
+    cssClass: "theme-pantheon",
+    preview: { primary: "#dfb15b", secondary: "#041c1c", accent: "#ffe6cb" },
+    colors: {
+      primary: "#dfb15b",
+      primaryHover: "#f3c87a",
+      primaryLight: "#3a3528",
+      primaryDark: "#9e7529",
+      bgPrimary: "#041c1c",
+      bgSecondary: "#020e0e",
+      bgTertiary: "#031515",
+      bgQuaternary: "#1c3030",
+      textPrimary: "#ffe6cb",
+      textSecondary: "rgba(255, 230, 203, 0.8)",
+      textTertiary: "rgba(255, 230, 203, 0.6)",
+      textQuaternary: "rgba(255, 230, 203, 0.4)",
+      borderPrimary: "rgba(223, 177, 91, 0.3)",
+      borderSecondary: "rgba(223, 177, 91, 0.5)",
+      borderTertiary: "#dfb15b",
+      accentSuccess: "#34d399",
+      accentWarning: "#fbbf24",
+      accentError: "#ef4444",
+      accentInfo: "#dfb15b",
+      shadow: "rgba(0, 0, 0, 0.5)",
+      shadowLg: "rgba(0, 0, 0, 0.75)",
+      hoverBg: "rgba(223, 177, 91, 0.1)",
+      activeBg: "rgba(223, 177, 91, 0.2)",
+      focusRing: "#dfb15b",
+    },
+  },
 };
+

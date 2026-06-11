@@ -65,20 +65,10 @@ import { PageHeaderProvider } from "@/contexts/PageHeaderProvider";
 import { useSystemActions } from "@/contexts/useSystemActions";
 import type { SystemAction } from "@/contexts/system-actions-context";
 import ConfigPage from "@/pages/ConfigPage";
-import EnvPage from "@/pages/EnvPage";
-import SessionsPage from "@/pages/SessionsPage";
-import LogsPage from "@/pages/LogsPage";
-import AnalyticsPage from "@/pages/AnalyticsPage";
-import ModelsPage from "@/pages/ModelsPage";
-import CronPage from "@/pages/CronPage";
-import ProfilesPage from "@/pages/ProfilesPage";
-import SkillsPage from "@/pages/SkillsPage";
-import PluginsPage from "@/pages/PluginsPage";
-import McpPage from "@/pages/McpPage";
-import PairingPage from "@/pages/PairingPage";
-import ChannelsPage from "@/pages/ChannelsPage";
-import WebhooksPage from "@/pages/WebhooksPage";
-import SystemPage from "@/pages/SystemPage";
+import AgentsPage from "@/pages/AgentsPage";
+import ToolUsePage from "@/pages/ToolUsePage";
+import WorkflowPage from "@/pages/WorkflowPage";
+import DocumentsPage from "@/pages/DocumentsPage";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { useI18n } from "@/i18n";
@@ -91,68 +81,51 @@ import { api } from "@/lib/api";
 import type { StatusResponse } from "@/lib/api";
 
 function RootRedirect() {
-  return <Navigate to="/sessions" replace />;
+  return <Navigate to="/agents" replace />;
 }
 
 function UnknownRouteFallback({ pluginsLoading }: { pluginsLoading: boolean }) {
   if (pluginsLoading) {
     return null;
   }
-  return <Navigate to="/sessions" replace />;
+  return <Navigate to="/agents" replace />;
 }
 
 const BUILTIN_ROUTES_CORE: Record<string, ComponentType> = {
   "/": RootRedirect,
-  "/sessions": SessionsPage,
-  "/analytics": AnalyticsPage,
-  "/models": ModelsPage,
-  "/logs": LogsPage,
-  "/observability": ObservabilityPage,
-  "/cron": CronPage,
-  "/skills": SkillsPage,
-  "/plugins": PluginsPage,
-  "/mcp": McpPage,
-  "/pairing": PairingPage,
-  "/channels": ChannelsPage,
-  "/webhooks": WebhooksPage,
-  "/system": SystemPage,
-  "/profiles": ProfilesPage,
+  "/agents": AgentsPage,
+  "/tools": ToolUsePage,
+  "/workflow": WorkflowPage,
+  "/documents": DocumentsPage,
   "/config": ConfigPage,
-  "/env": EnvPage,
 };
 
 const BUILTIN_NAV_REST: NavItem[] = [
   {
-    path: "/sessions",
-    labelKey: "sessions",
-    label: "Sessions",
-    icon: MessageSquare,
+    path: "/agents",
+    label: "Agents",
+    icon: Users,
   },
   {
-    path: "/analytics",
-    labelKey: "analytics",
-    label: "Analytics",
-    icon: BarChart3,
+    path: "/tools",
+    label: "Tool Use",
+    icon: Wrench,
   },
   {
-    path: "/models",
-    labelKey: "models",
-    label: "Models",
-    icon: Cpu,
+    path: "/workflow",
+    label: "Workflow",
+    icon: Activity,
   },
-  { path: "/logs", labelKey: "logs", label: "Logs", icon: FileText },
-  { path: "/observability", label: "Observability", icon: Activity },
-  { path: "/cron", labelKey: "cron", label: "Cron", icon: Clock },
-  { path: "/skills", labelKey: "skills", label: "Skills", icon: Package },
-  { path: "/plugins", labelKey: "plugins", label: "Plugins", icon: Puzzle },
-  { path: "/mcp", label: "MCP", icon: Plug },
-  { path: "/channels", label: "Channels", icon: Radio },
-  { path: "/webhooks", label: "Webhooks", icon: Webhook },
-  { path: "/pairing", label: "Pairing", icon: ShieldCheck },
-  { path: "/profiles", labelKey: "profiles", label: "Profiles", icon: Users },
-  { path: "/config", labelKey: "config", label: "Config", icon: Settings },
-  { path: "/env", labelKey: "keys", label: "Keys", icon: KeyRound },
-  { path: "/system", label: "System", icon: Wrench },
+  {
+    path: "/documents",
+    label: "Documents",
+    icon: FileText,
+  },
+  {
+    path: "/config",
+    label: "Config",
+    icon: Settings,
+  },
 ];
 
 const ICON_MAP: Record<string, ComponentType<{ className?: string }>> = {
@@ -306,6 +279,33 @@ export default function App() {
   const { theme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
+
+  const [projects, setProjects] = useState<string[]>(["Trismegistus-Dashboard"]);
+  const [activeProject, setActiveProject] = useState(() => localStorage.getItem("trismegistus-active-project") || "Trismegistus-Dashboard");
+  const [activeDevice, setActiveDevice] = useState(() => localStorage.getItem("trismegistus-active-device") || "Hermes-MacBook");
+
+  useEffect(() => {
+    fetch("/api/custom/projects")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProjects(data);
+        }
+      })
+      .catch((err) => console.error("Failed to load projects:", err));
+  }, []);
+
+  const handleProjectChange = (p: string) => {
+    setActiveProject(p);
+    localStorage.setItem("trismegistus-active-project", p);
+    window.dispatchEvent(new Event("trismegistus-project-changed"));
+  };
+
+  const handleDeviceChange = (d: string) => {
+    setActiveDevice(d);
+    localStorage.setItem("trismegistus-active-device", d);
+    window.dispatchEvent(new Event("trismegistus-device-changed"));
+  };
 
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -527,6 +527,37 @@ export default function App() {
               </Button>
             </div>
 
+            {/* Active Device and Active Project Switchers */}
+            {!collapsed && (
+              <div className="px-4 py-3 border-b border-current/10 flex flex-col gap-2 bg-muted/5 text-xs">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] text-text-tertiary font-mono uppercase">Device Context</label>
+                  <select
+                    value={activeDevice}
+                    onChange={(e) => handleDeviceChange(e.target.value)}
+                    className="bg-transparent border border-pantheon-single p-1 focus:outline-none text-text-secondary w-full"
+                  >
+                    <option value="Hermes-MacBook" className="bg-background-base text-text-primary">Hermes-MacBook</option>
+                    <option value="Hermes-Workstation" className="bg-background-base text-text-primary">Hermes-Workstation</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] text-text-tertiary font-mono uppercase">Active Workspace</label>
+                  <select
+                    value={activeProject}
+                    onChange={(e) => handleProjectChange(e.target.value)}
+                    className="bg-transparent border border-pantheon-single p-1 focus:outline-none text-text-secondary w-full select-none"
+                  >
+                    {projects.map((p) => (
+                      <option key={p} value={p} className="bg-background-base text-text-primary">
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
             <nav
               className="min-h-0 w-full flex-1 overflow-y-auto overflow-x-hidden border-t border-current/10 py-2"
               aria-label={t.app.navigation}
@@ -692,7 +723,7 @@ function SidebarNavLink({
     >
       <NavLink
         to={path}
-        end={path === "/sessions"}
+        end={path === "/agents"}
         onClick={closeMobile}
         aria-label={collapsed ? navLabel : undefined}
         onFocus={collapsed ? () => setHovered(true) : undefined}

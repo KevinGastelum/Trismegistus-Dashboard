@@ -97,11 +97,16 @@ function CategoryIcon({
   return <Icon className={className ?? "h-4 w-4"} />;
 }
 
+import ProfilesPage from "@/pages/ProfilesPage";
+import EnvPage from "@/pages/EnvPage";
+import SystemPage from "@/pages/SystemPage";
+import PairingPage from "@/pages/PairingPage";
+
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export default function ConfigPage() {
+function ConfigPageContent() {
   const [config, setConfig] = useState<Record<string, unknown> | null>(null);
   const [schema, setSchema] = useState<Record<
     string,
@@ -658,3 +663,65 @@ export default function ConfigPage() {
     </div>
   );
 }
+
+export default function ConfigPage() {
+  const [activeTab, setActiveTab] = useState<"settings" | "profiles" | "env" | "system" | "pairing">("settings");
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Tab Switcher */}
+      <div className="flex border border-border bg-muted/10 p-1 gap-1">
+        <Button
+          ghost={activeTab !== "settings"}
+          size="sm"
+          onClick={() => setActiveTab("settings")}
+          className="rounded-none border-pantheon-single"
+        >
+          Settings
+        </Button>
+        <Button
+          ghost={activeTab !== "profiles"}
+          size="sm"
+          onClick={() => setActiveTab("profiles")}
+          className="rounded-none border-pantheon-single"
+        >
+          Profiles
+        </Button>
+        <Button
+          ghost={activeTab !== "env"}
+          size="sm"
+          onClick={() => setActiveTab("env")}
+          className="rounded-none border-pantheon-single"
+        >
+          Keys
+        </Button>
+        <Button
+          ghost={activeTab !== "system"}
+          size="sm"
+          onClick={() => setActiveTab("system")}
+          className="rounded-none border-pantheon-single"
+        >
+          System
+        </Button>
+        <Button
+          ghost={activeTab !== "pairing"}
+          size="sm"
+          onClick={() => setActiveTab("pairing")}
+          className="rounded-none border-pantheon-single"
+        >
+          Pairing
+        </Button>
+      </div>
+
+      {/* Content Pane */}
+      <div>
+        {activeTab === "settings" && <ConfigPageContent />}
+        {activeTab === "profiles" && <ProfilesPage />}
+        {activeTab === "env" && <EnvPage />}
+        {activeTab === "system" && <SystemPage />}
+        {activeTab === "pairing" && <PairingPage />}
+      </div>
+    </div>
+  );
+}
+

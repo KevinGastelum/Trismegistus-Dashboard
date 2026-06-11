@@ -41,7 +41,7 @@ export function ObservabilityThemeProvider({ children }: { children: ReactNode }
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
   const [currentTheme, setCurrentTheme] = useState<string>(() => {
-    try { return localStorage.getItem(LS_THEME) || "dark"; } catch { return "dark"; }
+    try { return localStorage.getItem(LS_THEME) || "pantheon"; } catch { return "pantheon"; }
   });
   const [customThemes, setCustomThemes] = useState<CustomTheme[]>([]);
 

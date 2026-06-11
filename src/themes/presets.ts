@@ -241,6 +241,38 @@ export const defaultLargeTheme: DashboardTheme = {
   },
 };
 
+export const pantheonTheme: DashboardTheme = {
+  name: "pantheon",
+  label: "Greek Pantheon",
+  description: "Greek Pantheon & Renaissance style theme",
+  palette: {
+    background: { hex: "#031919", alpha: 1 },
+    midground: { hex: "#ffe6cb", alpha: 1 },
+    foreground: { hex: "#ffffff", alpha: 0 },
+    warmGlow: "rgba(223, 177, 91, 0.25)",
+    noiseOpacity: 0.8,
+  },
+  typography: {
+    fontSans: `"Spectral", Georgia, "Times New Roman", serif`,
+    fontMono: `"JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace`,
+    fontDisplay: `"Cinzel", "Spectral", Georgia, serif`,
+    fontUrl:
+      "https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Spectral:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400&display=swap",
+    baseSize: "15px",
+    lineHeight: "1.55",
+    letterSpacing: "0",
+  },
+  layout: {
+    radius: "0px",
+    density: "comfortable",
+  },
+  colorOverrides: {
+    primary: "#dfb15b",
+    border: "#dfb15b",
+    ring: "#dfb15b",
+  },
+};
+
 export const BUILTIN_THEMES: Record<string, DashboardTheme> = {
   default: defaultTheme,
   "default-large": defaultLargeTheme,
@@ -250,4 +282,6 @@ export const BUILTIN_THEMES: Record<string, DashboardTheme> = {
   mono: monoTheme,
   cyberpunk: cyberpunkTheme,
   rose: roseTheme,
+  pantheon: pantheonTheme,
 };
+
