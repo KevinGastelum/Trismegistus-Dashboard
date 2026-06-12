@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Plus, HelpCircle, FileText, Save, Check } from "lucide-react";
+import { Plus, FileText, Save } from "lucide-react";
 import { Button } from "@nous-research/ui/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@nous-research/ui/ui/components/card";
+import { HERMES_BASE_PATH } from "@/lib/api";
 
 interface DeityCard {
   id: string;
@@ -111,7 +112,7 @@ export default function AgentsPage() {
                 {/* Deity Illustration */}
                 <div className="w-full h-44 overflow-hidden mb-3 border border-border/20 bg-muted/10 relative">
                   <img
-                    src={deity.image}
+                    src={`${HERMES_BASE_PATH}${deity.image}`}
                     alt={deity.name}
                     className="woodcut-img w-full h-full object-cover"
                   />

@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Folder, FileText, ChevronRight, Search, X, BookOpen } from "lucide-react";
-import { Button } from "@nous-research/ui/ui/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@nous-research/ui/ui/components/card";
 import { Input } from "@nous-research/ui/ui/components/input";
+import { HERMES_BASE_PATH } from "@/lib/api";
 
 interface DocItem {
   name: string;
@@ -13,7 +12,6 @@ interface DocItem {
 }
 
 export default function DocumentsPage() {
-  const [rootItems, setRootItems] = useState<DocItem[]>([]);
   const [currentItems, setCurrentItems] = useState<DocItem[]>([]);
   const [breadcrumbs, setBreadcrumbs] = useState<{ name: string; items: DocItem[] }[]>([
     { name: "Root", items: [] },
@@ -29,7 +27,6 @@ export default function DocumentsPage() {
     fetch("/api/custom/docs")
       .then((res) => res.json())
       .then((data) => {
-        setRootItems(data);
         setCurrentItems(data);
         setBreadcrumbs([{ name: "Root", items: data }]);
       })
@@ -147,7 +144,7 @@ export default function DocumentsPage() {
                 {/* Folder cover image */}
                 <div className="w-full h-32 overflow-hidden mb-2 border border-border/20 bg-muted/10">
                   <img
-                    src={cover}
+                    src={`${HERMES_BASE_PATH}${cover}`}
                     alt={item.name}
                     className="woodcut-img w-full h-full object-cover"
                   />
